@@ -4,9 +4,10 @@ from scipy.io.wavfile import write
 from app.services.stt import SpeechToText
 from app.services.tts import TextToSpeech
 from app.services.emotion_analysis import MentalStateAnalyzer
+from app.services.logger import log_session
 
 SAMPLE_RATE = 44100
-DURATION = 10  # seconds
+DURATION = 5  # seconds
 
 
 def record_audio(filename="input.wav"):
@@ -30,15 +31,21 @@ def main():
     # Record audio
     record_audio()
 
-    # Speech to text
+    # Speech-to-text
     user_text = stt.transcribe("input.wav")
     print("📝 You said:", user_text)
 
-    # Mental state detection
-    state = analyzer.predict_state(user_text)
-    print(f"🧠 Detected Mental State: {state.upper()}")
+    # ================================
+    # 🔥 PREDICTION + RESPONSE LOGIC
+    # ================================
+    state, confidence = analyzer.predict_state_with_confidence(user_text)
 
-    # State-aware response (NO OpenAI, NO API calls)
+    print(f"🧠 Detected Mental State: {state.upper()}")
+    print(f"📊 Confidence Score: {confidence:.2f}")
+
+    # Log session
+    log_session(user_text, state, confidence)
+
     if state == "stressed":
         response = (
             "It sounds like you are feeling stressed. "
@@ -61,7 +68,7 @@ def main():
 
     print("🤖 AI Response:", response)
 
-    # Text to speech
+    # Text-to-speech
     tts.speak(response)
 
 
