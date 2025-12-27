@@ -1,4 +1,4 @@
-\# VocaMind-AI 🎙️🧠
+\# VocaMind-AI 
 
 
 
